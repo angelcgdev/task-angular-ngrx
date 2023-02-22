@@ -1,6 +1,6 @@
 import { createReducer, on } from "@ngrx/store";
 import { Todo } from "../model";
-import { TodosPageActions } from ".";
+import { TodosApiActions, TodosPageActions } from ".";
 
 export const todosStateFeatureKey = 'todosState';
 
@@ -15,7 +15,10 @@ const initState: TodosState =  {
 
 export const todosReducer = createReducer(
   initState,
-  on(TodosPageActions.init, ()=>({...initState}) ),
+  on(TodosApiActions.loadAllSucces, (state, action)=>({
+    ...state,
+    todos: action.todos,
+  }) ),
   on(TodosPageActions.addTodo, (state, action)=>({
     ...state,
     todos: [...state.todos, action.todo],
@@ -26,11 +29,11 @@ export const todosReducer = createReducer(
   })),
   on(TodosPageActions.markAsCompleted, (state, action)=>({
     ...state,
-    todos:[...state.todos.map(todo=>({...todo, completed: todo.id===action.todo.id?true:todo.completed}))]
+    todos:[...state.todos.map(todo=>todo.id === action.todo.id ? { ...todo, completed: true } : todo)]
   })),
   on(TodosPageActions.markAsPending, (state, action)=>({
     ...state,
-    todos:[...state.todos.map(todo=>({...todo, completed: todo.id===action.todo.id?false:todo.completed}))]
+    todos:[...state.todos.map(todo=>todo.id === action.todo.id ? { ...todo, completed: false }: todo)]
   })),
   on(TodosPageActions.clearCompleted, (state, action)=>({
     ...state,
